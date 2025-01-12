@@ -1,0 +1,55 @@
+﻿<AuthorizeView>
+    <Authorized>
+        <div class="">
+            <div class="menu-header">
+                <h3>My Application</h3>
+            </div>
+            <nav class="flex-column">
+                <ul class="menu-list">
+                    @if (menus != null)
+                    {
+                        @foreach (var item in menus!)
+                        {
+                            <li class="menu-item">
+                                <button class="menu-button" @onclick="() => ExpandItem(item)">
+                                    <span class="@item.Icon"></span>
+                                    <span class="menu-text">@item.Name</span>
+                                    <span class="expand-icon">@((item.Expand) ? "▲" : "▼")</span>
+                                </button>
+                                @if (item.Expand)
+                                {
+                                    <ul class="submenu-list">
+                                        @foreach (var item_s in item.FormSubParentDTOs!)
+                                        {
+                                            <li class="submenu-item">
+                                                <button class="submenu-button" @onclick="() => ExpandItem(item_s)">
+                                                    <span>@item_s.Name</span>
+                                                    <span class="expand-icon">@((item_s.Expand) ? "▲" : "▼")</span>
+                                                </button>
+                                                @if (item_s.Expand)
+                                                {
+                                                    <ul class="submenu-list">
+                                                        @foreach (var item_f in item_s.Forms!)
+                                                        {
+                                                            <li class="submenu-item">
+                                                                <span class="@item_f.Icon"></span>
+                                                                <NavLink href="@item_f.Href" class="submenu-link">
+                                                                    @item_f.Name
+                                                                </NavLink>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </li>
+                        }
+                    }
+                </ul>
+            </nav>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
