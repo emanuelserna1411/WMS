@@ -52,6 +52,7 @@ namespace WMS.Backend.Data
                 StaticForm.ListForm.Add(new Form { FormCode = 13, Secuence = 50, Name = "Clasificación Producto" });
                 StaticForm.ListForm.Add(new Form { FormCode = 14, Secuence = 60, Name = "Unidad Medida" });
                 StaticForm.ListForm.Add(new Form { FormCode = 15, Secuence = 70, Name = "Productos" });
+                StaticForm.ListForm.Add(new Form { FormCode = 16, Secuence = 80, Name = "Proveedores" });
                 #endregion
 
                 #region Locacion
@@ -440,6 +441,21 @@ namespace WMS.Backend.Data
                             FormSubParentId = formSubParent.Id,
                             Name = "Productos",
                             Href = "/products",
+                            Icon = "bi bi-box",
+                            Secuence = formStatic.Secuence,
+                            FormCode = formStatic.FormCode
+                        };
+                        _context.Add(form);
+                        await _context.SaveChangesAsync();
+                    }
+                    if (!forms.Where(w => w.FormSubParentId == formSubParent.Id && w.Name == "Productos").Any())
+                    {
+                        var formStatic = StaticForm.ListForm.Where(w => w.Name == "Productos").FirstOrDefault()!;
+                        form = new Form
+                        {
+                            FormSubParentId = formSubParent.Id,
+                            Name = "Proveedores",
+                            Href = "/suppliers",
                             Icon = "bi bi-box",
                             Secuence = formStatic.Secuence,
                             FormCode = formStatic.FormCode

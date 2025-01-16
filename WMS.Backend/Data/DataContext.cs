@@ -25,6 +25,7 @@ namespace WMS.Backend.Data
         public DbSet<Company> Companies { get; set; }
         public DbSet<Branch> Branches { get; set; }
         public DbSet<Winery> Wineries { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<SubWinery> SubWineries { get; set; }
         public DbSet<Bin> Bins { get; set; }
         public DbSet<BinType> BinTypes { get; set; }

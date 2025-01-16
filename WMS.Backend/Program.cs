@@ -123,6 +123,9 @@ builder.Services.AddScoped<IUMUnitOfWork, UMUnifOfWork>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductUnitOfWork, ProductUnitOfWork>();
 
+builder.Services.AddScoped<ISuppliersRepository, SupplierRepository>();
+builder.Services.AddScoped<ISuppliersUnitOfWork, SuppliersUnitOfWork>();
+
 
 
 builder.Services.AddIdentity<User, IdentityRole>(x =>

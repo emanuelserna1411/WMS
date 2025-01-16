@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WMS.Share.Models.Magister
 {
-    public class Supplier
+    public class Supplier: UserUpdate
     {
         [Key]
         public long Id { get; set; }
