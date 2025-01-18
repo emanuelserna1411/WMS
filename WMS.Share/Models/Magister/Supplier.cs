@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,18 +47,23 @@ namespace WMS.Share.Models.Magister
 
         [Display(Name = "Adjunto1")]
         public string? Attachment1 { get; set; }
+        [NotMapped] public string? Attachment1Name { get; set; }
 
         [Display(Name = "Adjunto2")]
         public string? Attachment2 { get; set; }
+        [NotMapped] public string? Attachment2Name { get; set; }
 
         [Display(Name = "Adjunto3")]
         public string? Attachment3 { get; set; }
+        [NotMapped] public string? Attachment3Name { get; set; }
 
         [Display(Name = "Adjunto4")]
         public string? Attachment4 { get; set; }
+        [NotMapped] public string? Attachment4Name { get; set; }
 
         [Display(Name = "Adjunto5")]
         public string? Attachment5 { get; set; }
+        [NotMapped] public string? Attachment5Name { get; set; }
 
     }
 }

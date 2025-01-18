@@ -1,0 +1,111 @@
+﻿<h3>Proveedores</h3>
+@if (loading)
+{
+    <Loading />
+}
+else
+{
+    <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
+    <EditForm EditContext="editContext" OnSubmit="OnDataAnnotationsValidatedAsync">
+        <DataAnnotationsValidator />
+        <div class="col-12">
+            <div class="row">
+                <div class="card col-12">
+                    <div class="card-body col-12">
+                        <div class="row">
+                            <div class="col-12">
+@*                                 <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+                                    <button type="button" class="btn btn-info mx-1" @onclick="SearchDocument">Sucursal</button>
+                                    <label class="form-label">@Name</label>
+                                </div> *@
+                                <div class="mb-3">
+                                    <label>Nombre de la compañía:</label>
+                                    <div>
+                                        <InputText class="form-control" @bind-value="@Model.CompanyName" />
+                                        <ValidationMessage For="@(() => Model.CompanyName)" />
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Número de Documento:</label>
+                                    <div>
+                                        <InputText class="form-control" @bind-value="@Model.Document" />
+                                        <ValidationMessage For="@(() => Model.CompanyName)" />
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Nombre:</label>
+                                    <div>
+                                        <InputText class="form-control" @bind-Value="@Model.FirstName" />
+                                        <ValidationMessage For="@(() => Model.FirstName)" />
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Apellido:</label>
+                                    <div>
+                                        <InputText class="form-control" @bind-Value="@Model.LastName" />
+                                        <ValidationMessage For="@(() => Model.LastName)" />
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Dirección:</label>
+                                    <div>
+                                        <InputText class="form-control" @bind-Value="@Model.Address" />
+                                        <ValidationMessage For="@(() => Model.Address)" />
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Télefono:</label>
+                                    <div>
+                                        <InputText class="form-control" @bind-Value="@Model.Phone" />
+                                        <ValidationMessage For="@(() => Model.Phone)" />
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Email:</label>
+                                    <div>
+                                        <InputText class="form-control" @bind-Value="@Model.Email" />
+                                        <ValidationMessage For="@(() => Model.Email)" />
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Archivo 1:</label>
+                                    <InputFile OnChange="(e)=>HandleFileChange(e,1)" accept=".jpg,.jpeg,.png,.pdf"></InputFile>
+                                    @if (Model.Attachment1 is not null)
+                                    {
+                                        <div>
+                                            <div style="margin: 10px">
+                                                <img src="C:/Users/ROSA OLMOS/WMS/WMS.Backend/Uploads/@Model.Attachment1" style="width:300px" />
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="mb-3">
+                                    <label>Archivo 2:</label>
+                                    <InputFile OnChange="(e)=>HandleFileChange(e,2)" accept=".jpg,.jpeg,.png,.pdf"></InputFile>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Archivo 3:</label>
+                                    <InputFile OnChange="(e)=>HandleFileChange(e,3)" accept=".jpg,.jpeg,.png,.pdf"></InputFile>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Archivo 4:</label>
+                                    <InputFile OnChange="(e)=>HandleFileChange(e,4)" accept=".jpg,.jpeg,.png,.pdf"></InputFile>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Archivo 4:</label>
+                                    <InputFile OnChange="(e)=>HandleFileChange(e,5)" accept=".jpg,.jpeg,.png,.pdf"></InputFile>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span>
+                            <button class="btn btn-sm btn-success" type="submit"><i class="bi bi-floppy" /> Guardar</button>
+                            <button class="btn btn-sm btn-primary" @onclick="ReturnAction"><i class="bi bi-arrow-left-square" />Regresar</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}

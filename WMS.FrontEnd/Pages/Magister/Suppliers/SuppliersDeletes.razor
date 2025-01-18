@@ -1,20 +1,20 @@
-﻿@page "/suppliers"
+﻿@page "/suppliers/deletes"
 
 
-<h3>Proveedores</h3>
+<h3>Proveedores Eliminadas</h3>
 
 <div class="card">
     <div class="card-header">
         <span>
-            <i class="bi bi-card-heading" /> Bodega
-            <a class="btn btn-sm btn-primary" href="/suppliers/create"><i class="bi bi-plus-square" /> Nuevo</a>
+            <i class="bi bi-card-heading" /> Proveedor Eliminado
+            <a class="btn btn-sm btn-primary" href="/suppliers"><i class="bi bi-arrow-left-square" /> Regresar</a>
         </span>
     </div>
     <div class="card-body">
         <Pagination CurrentPage="currentPage"
                     TotalPages="totalPages"
                     SelectedPage="SelectedPageAsync" />
-        @* <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+@*         <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
             <button style="width: 120px;" type="button" class="btn btn-info mx-1" @onclick="SearchBranch">Sucursal</button>
             <label class="form-label">@NameBranch</label>
         </div> *@
@@ -23,12 +23,6 @@
             <button type="button" class="btn btn-outline-primary mx-1" @onclick="ApplyFilterAsync">Filtrar</button>
             <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Limpiar</button>
         </div>
-        <div>
-            <a class="btn btn-sm btn-outline-danger" href="/suppliers/deletes"><i class="bi bi-trash" />Eliminados</a>
-            <button type="button" class="btn btn-outline-succes mx-1" @onclick="Export"><i class="bi bi-download" />Exportar</button>
-            <a class="btn btn-sm btn-outline-primary" href="/suppliers/upload"><i class="bi bi-upload" />Subir Plano</a>
-        </div>
-
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -54,7 +48,7 @@
                             <td>@item.Phone</td>
                             <td>@item.Email</td>
                             <td>
-                                <a href="/suppliers/edit/@item.Id" class="btn btn-warning"><i class="bi bi-pencil-fill" /></a>
+                                <button @onclick=@(() => RestoreAsycn(item)) class="btn btn-success"><i class="bi bi-check2-square" /></button>
                                 <button @onclick=@(() => DeleteAsycn(item)) class="btn btn-danger"><i class="bi bi-trash" /></button>
                                 <a class="btn btn-primary" @onclick=@(() => ShowModal(item))><i class="bi bi-clock-history" /></a>
                             </td>

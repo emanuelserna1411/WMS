@@ -7,6 +7,7 @@ namespace WMS.Backend.Repositories.Interfaces.Magister
 {
     public interface ISuppliersRepository
     {
+        Task<ActionResponse<Supplier>> ActiveAsync(long id, long Id_local);
         Task<ActionResponse<Supplier>> GetAsync(long id);
 
         Task<ActionResponse<IEnumerable<Supplier>>> GetAsync();

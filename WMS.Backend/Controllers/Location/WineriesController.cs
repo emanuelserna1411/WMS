@@ -187,10 +187,10 @@ namespace WMS.Backend.Controllers.Location
             {
                 return BadRequest(AuthForm.Message);
             }
-            WineryHelper.FilePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Uploads");
-            Winery winery = await WineryHelper.RegisterFilesAsync(model, _fileStorage);
+            //WineryHelper.FilePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Uploads");
+            //Winery winery = await WineryHelper.RegisterFilesAsync(model, _fileStorage);
             var user = AuthForm.Result;
-            var action = await _unitOfWork.AddAsync(winery, user!.Id_Local);
+            var action = await _unitOfWork.AddAsync(model, user!.Id_Local);
             if (action.WasSuccess)
             {
                 return Ok(action.Result);

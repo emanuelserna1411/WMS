@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using WMS.Share.Models.Magister;
 using WMS.Backend.UnitsOfWork.Interfaces.Magister;
+using WMS.Share.Models.Location;
+using WMS.Backend.UnitsOfWork.Implementations.Magister;
 
 namespace WMS.Backend.Controllers.Magister
 {

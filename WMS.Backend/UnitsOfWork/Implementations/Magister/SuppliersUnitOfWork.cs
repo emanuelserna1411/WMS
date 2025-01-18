@@ -16,10 +16,7 @@ namespace WMS.Backend.UnitsOfWork.Implementations.Magister
             _repository = repository;
         }
 
-        public Task<ActionResponse<Supplier>> ActiveAsync(long id, long Id_local)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<ActionResponse<Supplier>> ActiveAsync(long id, long Id_local)=>_repository.ActiveAsync(id, Id_local);
 
         public Task<ActionResponse<Supplier>> AddAsync(Supplier model, long Id_Local)=>_repository.AddAsync(model, Id_Local);
 

@@ -1,25 +1,21 @@
 ﻿using Blazored.Modal.Services;
 using Blazored.Modal;
-using ClosedXML.Excel;
 using CurrieTechnologies.Razor.SweetAlert2;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using System.Net;
 using WMS.FrontEnd.Pages.Location.Wineries;
 using WMS.FrontEnd.Repositories;
 using WMS.FrontEnd.Shared;
 using WMS.Share.DTOs;
-using WMS.Share.Models.Location;
 using WMS.Share.Models.Magister;
 
 namespace WMS.FrontEnd.Pages.Magister.Suppliers
 {
-    public partial class SuppliersIndex
+    public partial class SuppliersDeletes
     {
         private int currentPage = 1;
         private int totalPages;
 
-        [Inject] private IJSRuntime JSRuntime { get; set; } = null!;
         [Inject] private IRepository Repository { get; set; } = null!;
         [Inject] private SweetAlertService SweetAlertService { get; set; } = null!;
         [Inject] private NavigationManager NavigationManager { get; set; } = null!;
@@ -62,12 +58,11 @@ namespace WMS.FrontEnd.Pages.Magister.Suppliers
 
         private async Task<bool> LoadListAsync(int page)
         {
-            var url = $"api/Supplier/getasync?page={page}";
+            var url = $"api/Supplier/getdeleteasync?page={page}";
             if (!string.IsNullOrEmpty(Filter))
             {
                 url += $"&filter={Filter}";
             }
-
             var responseHttp = await Repository.GetAsync<List<Supplier>>(url);
             if (responseHttp.Error)
             {
@@ -81,7 +76,7 @@ namespace WMS.FrontEnd.Pages.Magister.Suppliers
 
         private async Task LoadPagesAsync()
         {
-            var url = $"api/Supplier/totalPages";
+            var url = $"api/Supplier/deletetotalPages";
             string FilterUrl = string.Empty;
             if (!String.IsNullOrEmpty(Filter))
             {
@@ -91,6 +86,7 @@ namespace WMS.FrontEnd.Pages.Magister.Suppliers
             {
                 url += FilterUrl;
             }
+
             var responseHttp = await Repository.GetAsync<int>(url);
             if (responseHttp.Error)
             {
@@ -104,6 +100,9 @@ namespace WMS.FrontEnd.Pages.Magister.Suppliers
         private async Task CleanFilterAsync()
         {
             Filter = string.Empty;
+            BranchId = 0;
+            NameBranch = string.Empty;
+            DescriptionBranch = string.Empty;
             await ApplyFilterAsync();
         }
 
@@ -114,12 +113,12 @@ namespace WMS.FrontEnd.Pages.Magister.Suppliers
             await SelectedPageAsync(page);
         }
 
-        private async Task DeleteAsycn(Supplier model)
+        private async Task RestoreAsycn(Supplier model)
         {
             var result = await SweetAlertService.FireAsync(new SweetAlertOptions
             {
                 Title = "Confirmación",
-                Text = $"¿Estas seguro de eliminar : {model.CompanyName}?",
+                Text = $"¿Estas seguro de restaurar: {model.CompanyName}?",
                 Icon = SweetAlertIcon.Question,
                 ShowCancelButton = true,
             });
@@ -129,12 +128,53 @@ namespace WMS.FrontEnd.Pages.Magister.Suppliers
                 return;
             }
 
-            var responseHttp = await Repository.DeleteAsync<Supplier>($"api/Supplier/deleteasync/{model.Id}");
+            var responseHttp = await Repository.GetAsync<Supplier>($"api/Supplier/restoreasync/{model.Id}");
             if (responseHttp.Error)
             {
                 if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
                 {
-                    NavigationManager.NavigateTo("/suppliers");
+                    NavigationManager.NavigateTo("/suppliers/deletes");
+                }
+                else
+                {
+                    var mensajeError = await responseHttp.GetErrorMessageAsync();
+                    await SweetAlertService.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
+                }
+                return;
+            }
+
+            await LoadAsync();
+            var toast = SweetAlertService.Mixin(new SweetAlertOptions
+            {
+                Toast = true,
+                Position = SweetAlertPosition.BottomEnd,
+                ShowConfirmButton = true,
+                Timer = 3000
+            });
+            await toast.FireAsync(icon: SweetAlertIcon.Success, message: "Registro restaurado con éxito.");
+        }
+
+        private async Task DeleteAsycn(Supplier model)
+        {
+            var result = await SweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmación",
+                Text = $"¿Estas seguro de eliminar definitivamente: {model.CompanyName}?",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true,
+            });
+            var confirm = string.IsNullOrEmpty(result.Value);
+            if (confirm)
+            {
+                return;
+            }
+
+            var responseHttp = await Repository.DeleteAsync<Supplier>($"api/Supplier/deletefullasync/{model.Id}");
+            if (responseHttp.Error)
+            {
+                if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+                {
+                    NavigationManager.NavigateTo("/suppliers/deletes");
                 }
                 else
                 {
@@ -153,74 +193,6 @@ namespace WMS.FrontEnd.Pages.Magister.Suppliers
                 Timer = 3000
             });
             await toast.FireAsync(icon: SweetAlertIcon.Success, message: "Registro eliminado con éxito.");
-        }
-
-        private async Task Export()
-        {
-            var url = $"api/Supplier/downloadasync";
-            string FilterUrl = string.Empty;
-            if (!String.IsNullOrEmpty(Filter))
-            {
-                FilterUrl += $"?filter={Filter}";
-            }
-            if (!string.IsNullOrEmpty(FilterUrl))
-            {
-                url += FilterUrl;
-            }
-
-            var responseHttp = await Repository.GetAsync<List<Supplier>>(url);
-            if (responseHttp.Error)
-            {
-                var message = await responseHttp.GetErrorMessageAsync();
-                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-                return;
-            }
-            var ListDownload = responseHttp.Response;
-
-            using (var book = new XLWorkbook())
-            {
-                IXLWorksheet sheet = book.Worksheets.Add("FormatoProveedores");
-                sheet.Cell(1, 1).Value = "Nombre de la compañia";
-                sheet.Cell(1, 2).Value = "Nombres";
-                sheet.Cell(1, 3).Value = "Apellidos";
-                sheet.Cell(1, 4).Value = "Dirección";
-                sheet.Cell(1, 5).Value = "Teléfono";
-                sheet.Cell(1, 6).Value = "Correo";
-
-                if (ListDownload == null || ListDownload.Count == 0)
-                {
-                    sheet.Cell(2, 1).Value = 0;
-                    sheet.Cell(2, 2).Value = "person1";
-                    sheet.Cell(2, 3).Value = "lastname";
-                    sheet.Cell(2, 4).Value = "carrera 20 sur";
-                    sheet.Cell(2, 5).Value = 1;
-                    sheet.Cell(2, 6).Value = 0;
-                }
-                else
-                {
-                    int i = 2;
-                    foreach (var item in ListDownload)
-                    {
-                        sheet.Cell(i, 1).Value = item.CompanyName;
-                        sheet.Cell(i, 2).Value = item.FirstName;
-                        sheet.Cell(i, 3).Value = item.LastName;
-                        sheet.Cell(i, 4).Value = item.Address;
-                        sheet.Cell(i, 5).Value = item.Phone;
-                        sheet.Cell(i, 6).Value = item.Email;
-                        i++;
-                    }
-                }
-
-                using (var memory = new MemoryStream())
-                {
-                    book.SaveAs(memory);
-                    await JSRuntime.InvokeAsync<object>(
-                            "DownloadExcel",
-                            $"{DateTime.Now.ToString("yyyyMMdd")}_Proveedores.xlsx",
-                            Convert.ToBase64String(memory.ToArray())
-                    );
-                }
-            }
         }
 
         private async Task ShowModal(Supplier model)
@@ -245,27 +217,27 @@ namespace WMS.FrontEnd.Pages.Magister.Suppliers
             //}
         }
 
-        //private async Task SearchBranch()
-        //{
-        //    IModalReference modalReference;
-        //    var parameters = new ModalParameters();
-        //    parameters.Add("Label", "Sucursal");
-        //    parameters.Add("Url", "api/branches/genericsearch");
+        private async Task SearchBranch()
+        {
+            IModalReference modalReference;
+            var parameters = new ModalParameters();
+            parameters.Add("Label", "Sucursal");
+            parameters.Add("Url", "api/branches/genericsearch");
 
-        //    var modalOptions = new ModalOptions();
-        //    modalOptions.HideCloseButton = false;
-        //    modalOptions.DisableBackgroundCancel = false;
-        //    modalReference = Modal.Show<SearchForm>(string.Empty, parameters, modalOptions);
+            var modalOptions = new ModalOptions();
+            modalOptions.HideCloseButton = false;
+            modalOptions.DisableBackgroundCancel = false;
+            modalReference = Modal.Show<SearchForm>(string.Empty, parameters, modalOptions);
 
-        //    var result = await modalReference.Result;
-        //    if (result.Confirmed)
-        //    {
-        //        var ItemSelect = (GenericSearchDTO)result.Data!;
-        //        NameBranch = ItemSelect.Name;
-        //        DescriptionBranch = " - " + ItemSelect.Description;
-        //        BranchId = ItemSelect.Id;
-        //    }
-        //    return;
-        //}
+            var result = await modalReference.Result;
+            if (result.Confirmed)
+            {
+                var ItemSelect = (GenericSearchDTO)result.Data!;
+                NameBranch = ItemSelect.Name;
+                DescriptionBranch = " - " + ItemSelect.Description;
+                BranchId = ItemSelect.Id;
+            }
+            return;
+        }
     }
 }

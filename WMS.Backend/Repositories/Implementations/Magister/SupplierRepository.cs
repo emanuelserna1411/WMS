@@ -3,7 +3,6 @@ using WMS.Backend.Data;
 using WMS.Backend.Helpers;
 using WMS.Backend.Repositories.Interfaces.Magister;
 using WMS.Share.DTOs;
-using WMS.Share.Models.Location;
 using WMS.Share.Models.Magister;
 using WMS.Share.Responses;
 
@@ -16,6 +15,69 @@ namespace WMS.Backend.Repositories.Implementations.Magister
         public SupplierRepository(DataContext context)
         {
             _context = context;
+        }
+
+        public async Task<ActionResponse<Supplier>> ActiveAsync(long id, long Id_local)
+        {
+            var user = await _context.Users.Where(w => w.Id_Local == Id_local).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return new ActionResponse<Supplier>
+                {
+                    WasSuccess = false,
+                    Message = "No se encuentra usuario"
+                };
+            }
+            var model = await _context.Suppliers.FindAsync(id);
+            if (model == null)
+            {
+                return new ActionResponse<Supplier>
+                {
+                    WasSuccess = false,
+                    Message = "No se encuentra el registro"
+                };
+            }
+            if (!model.Delete)
+            {
+                return new ActionResponse<Supplier>
+                {
+                    WasSuccess = false,
+                    Message = "El registro ya se encuentra activo"
+                };
+            }
+            model.UpdateUserId = Id_local;
+            model.UpdateDate = DateTime.Now;
+            model.Delete = false;
+            _context.Update(model);
+            try
+            {
+                await _context.SaveChangesAsync();
+                return new ActionResponse<Supplier>
+                {
+                    WasSuccess = true,
+                    Result = model
+                };
+            }
+            catch (DbUpdateException ex)
+            {
+                if (ex.InnerException != null)
+                {
+                    if (ex.InnerException!.Message.Contains("duplicate"))
+                    {
+                        return DbUpdateExceptionActionResponse();
+                    }
+                }
+
+                return new ActionResponse<Supplier>
+                {
+                    WasSuccess = false,
+                    Message = ex.Message
+                };
+            }
+            catch (Exception exception)
+            {
+                return ExceptionActionResponse(exception);
+            }
         }
 
         public async Task<ActionResponse<Supplier>> AddAsync(Supplier model, long Id_Local)
@@ -409,9 +471,24 @@ namespace WMS.Backend.Repositories.Implementations.Magister
             };
         }
 
-        public Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination)
+        public async Task<ActionResponse<int>> GetTotalPagesAsync(PaginationDTO pagination)
         {
-            throw new NotImplementedException();
+            var queryable = _context.Suppliers.Where(w => w.Delete == false).AsQueryable();
+            //if (!string.IsNullOrWhiteSpace(pagination.Filter1))
+            //{
+            //    queryable = queryable.Where(x => x.BranchId.ToString() == pagination.Filter1);
+            //}
+            //if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            //{
+            //    queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            //}
+            var count = await queryable.CountAsync();
+            int totalPages = (int)Math.Ceiling((double)count / pagination.RecordsNumber);
+            return new ActionResponse<int>
+            {
+                WasSuccess = true,
+                Result = totalPages
+            };
         }
 
         public async Task<ActionResponse<Supplier>> UpdateAsync(Supplier model, long Id_Local)
@@ -436,7 +513,22 @@ namespace WMS.Backend.Repositories.Implementations.Magister
 
             try
             {
-                _context.Update(model);
+                var supplier = await _context.Suppliers.FindAsync(model.Id);
+                
+                supplier!.CompanyName = model.CompanyName;
+                supplier.Document = model.Document;
+                supplier.DocumentTypeUserId = model.DocumentTypeUserId;
+                supplier.FirstName = model.FirstName;
+                supplier.LastName = model.LastName;
+                supplier.Email = model.Email;
+                supplier.Address = model.Address;
+                supplier.Attachment1 = model.Attachment1;
+                supplier.Attachment2 = model.Attachment2;
+                supplier.Attachment3 = model.Attachment3;
+                supplier.Attachment4 = model.Attachment4;
+                supplier.Attachment5 = model.Attachment5;
+
+                _context.Update(supplier);
                 await _context.SaveChangesAsync();
                 return new ActionResponse<Supplier>
                 {

@@ -9,13 +9,7 @@ main {
 }
 
 .sidebar {
-    width: 240px;
-    background-color: #232334;
-    color: white;
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+    background-image: linear-gradient(180deg, rgb(162, 120, 66) 0%, #958856 80%);
 }
 
 .top-row {
