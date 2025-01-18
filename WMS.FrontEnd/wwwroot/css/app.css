@@ -207,6 +207,7 @@ code {
 
 .menu-header {
     padding: 16px;
+    color: white;
     text-align: center;
     border-bottom: 1px solid #2a2a3d;
 }
@@ -247,7 +248,8 @@ code {
 }
 
     .menu-button:hover {
-        background-color: #2a2a3d;
+        background-color: #33333d;
+        transition: background-color 0.2s ease-in-out;
     }
 
 .menu-text {
@@ -282,7 +284,8 @@ code {
 }
 
     .submenu-button:hover {
-        background-color: #34344e;
+        background-color: #33333d;
+        transition: background-color 0.2s ease-in-out;
     }
 
 .submenu-link {
