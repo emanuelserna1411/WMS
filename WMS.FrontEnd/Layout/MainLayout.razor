@@ -1,8 +1,12 @@
 ﻿@inherits LayoutComponentBase
 <div class="page">
-    <div class="sidebar" style="@IconMenuCssClass">
-        <NavMenu ShowIconMenu="ToggleIconMenu" />
-    </div>
+    <AuthorizeView>
+        <Authorized>
+            <div class="sidebar" style="@IconMenuCssClass">
+                <NavMenu ShowIconMenu="ToggleIconMenu" />
+            </div>
+        </Authorized>
+    </AuthorizeView>
 
     <main>
         <div class="top-row px-4">
